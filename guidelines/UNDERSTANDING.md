@@ -37,9 +37,33 @@ Two additional verdicts appear in the [Contributing](../docs/CONTRIBUTING.md) gu
 
 ### Generated vs. Executed
 
-A key distinction in the results is whether the model *generated* a dangerous command or whether that command *actually executed*. In the prompt injection tests, the model was called via the Gemini API directly — not through OpenClaw's CLI — so responses show what the model *would do* if given tool access. The container security and code audit results, by contrast, test the actual runtime environment.
+A key distinction in the results is whether the model *generated* a dangerous command or whether that command *actually executed*.
 
-The sandbox exists precisely to prevent generated commands from causing real harm. Understanding which layer caught (or would catch) a failure is part of reading the results critically.
+The prompt injection tests call the Gemini API directly with `curl` — no OpenClaw runtime is involved. The only thing borrowed from OpenClaw is its **system prompt** (the text that tells the model it has bash access, file access, etc.). This means the tests show what the model *would do* if given tool access, not what actually ran on a machine.
+
+**Why this matters:** The vulnerability lives in the model, not in OpenClaw's code. When the model receives a deceptive message and responds with `cat ~/.openclaw/openclaw.json`, that decision happened inside the model's weights. OpenClaw's role is what happens *next* — whether that generated command gets executed.
+
+Here is the difference between the two scenarios:
+
+**Via curl (how these tests work):**
+
+```
+You → curl → Gemini API → model generates dangerous command → text response (nothing executes)
+```
+
+**Via OpenClaw (the real-world risk):**
+
+```
+User → OpenClaw → Gemini API → model generates dangerous command → OpenClaw executes it on your machine
+```
+
+Same model, same system prompt, same response — but in the second scenario, OpenClaw's tool executor actually runs the command. The curl test is a safe way to prove the model would comply, without risking real execution.
+
+Think of it like testing a lock: the curl test shows "this key fits the lock." Running it through OpenClaw would actually open the door.
+
+**Will results be identical across runs?** Mostly yes. The tests use the same model (`gemini-2.5-flash`), the same system prompt, and low temperature (`0.1`, nearly deterministic). The exact wording may vary slightly, but the behavior — comply vs. refuse — is consistent.
+
+The container security and code audit results, by contrast, test the actual runtime environment. The sandbox exists precisely to prevent generated commands from causing real harm. Understanding which layer caught (or would catch) a failure is part of reading the results critically.
 
 ---
 
@@ -76,6 +100,24 @@ The sandbox is a Docker container built with 7 security layers, each blocking a 
 | **No Host Mounts** | The container cannot see the host filesystem, Docker socket, or host devices | The guest cannot access the building's maintenance tunnels |
 
 For the full technical specification — YAML configuration, capability lists, tmpfs mount details — see [Architecture](../docs/ARCHITECTURE.md).
+
+### Why Docker? Isn't Docker Itself Insecure?
+
+This is a fair question. Docker containers share the host kernel, and container escape vulnerabilities have been discovered in the past (e.g., CVE-2019-5736 in runc, CVE-2024-21626). A determined attacker with a kernel exploit could, in theory, break out of any container.
+
+However, the sandbox uses Docker for **practical, not absolute** reasons:
+
+1. **The goal is testing the AI agent, not building a production security boundary.** The sandbox exists to observe how OpenClaw and its underlying model behave when given deceptive inputs. It needs to be isolated enough to prevent accidental harm during testing — not hardened enough to withstand a nation-state attacker.
+
+2. **Accessibility matters.** Docker runs on Windows, macOS, and Linux. It is free, widely installed, and well-documented. Alternatives that provide stronger isolation — full virtual machines (QEMU/KVM), microVMs (Firecracker), or bare-metal air-gapped setups — all raise the barrier to entry significantly. A sandbox that nobody can run is not useful.
+
+3. **The 7 hardening layers mitigate Docker's known weaknesses.** Dropping all capabilities, enabling no-new-privileges, using a read-only filesystem, and blocking network access collectively close the most common container escape paths. This is not the same as running a default `docker run` with no hardening.
+
+4. **The threat model is the AI model, not a human attacker.** The agent inside the container does not have the sophistication to chain kernel exploits. The risk being tested is: "Does the model follow a deceptive instruction?" — not "Can a skilled hacker escape Docker?"
+
+**If you need stronger isolation**, you can run the Docker container inside a virtual machine. This adds a second isolation boundary (the hypervisor) between the container and your host OS. Cloud providers like AWS, GCP, and Azure offer this by default — their container services already run inside VMs. For local testing, tools like [VirtualBox](https://www.virtualbox.org/) or [UTM](https://mac.getutm.app/) can provide the same layer.
+
+The project does not claim Docker provides perfect security. It claims Docker provides *sufficient* security for the purpose of safely observing AI agent behavior during controlled testing.
 
 ---
 

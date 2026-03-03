@@ -14,7 +14,7 @@
 
 <br>
 
-<em>3 out of 5 prompt injection attacks succeeded against Gemini 2.5 Flash — including a critical role hijack that exfiltrated simulated API keys.</em>
+<em>3 out of 5 prompt injection attacks succeeded — including a critical role hijack that exfiltrated simulated API keys. Tested against Gemini 2.5 Flash (free tier), but the toolkit works with any LLM.</em>
 
 <br><br>
 
@@ -39,7 +39,9 @@
 
 ## Key Findings
 
-Five prompt injection payloads were tested against **Gemini 2.5 Flash** using OpenClaw's default system prompt. The system prompt grants the model shell execution, file access, and personal data access with **no safety guardrails**.
+Five prompt injection payloads were tested using OpenClaw's default system prompt, which grants the model shell execution, file access, and personal data access with **no safety guardrails**.
+
+The published results use **Gemini 2.5 Flash** because it offers a [free API tier](https://ai.google.dev/), making it easy for anyone to reproduce. The toolkit itself is model-agnostic — you can test any cloud-hosted or locally-running LLM by changing the API endpoint.
 
 | # | Test | Technique | Result |
 |:---:|------|-----------|:------:|
@@ -103,13 +105,16 @@ docker compose up -d && docker exec -it openclaw-sandbox bash /home/openclaw/tes
 > [!NOTE]
 > The automated tests (recon, privilege escalation, data exfiltration, code audit) run entirely offline inside an isolated container. **No internet access or API keys required.**
 >
-> For prompt injection tests (category 04), switch to the `sandbox-internet` network and provide a Gemini API key. See [Setup Guide](docs/SETUP.md).
+> For prompt injection tests (category 04), switch to the `sandbox-internet` network and provide an API key. The default script targets Gemini (free tier), but you can adapt it for any LLM API. See [Setup Guide](docs/SETUP.md).
 
 ---
 
 ## Container Security
 
 The sandbox uses **7 independent security layers** following a defense-in-depth approach. Compromise of any single layer does not break overall isolation.
+
+> [!NOTE]
+> **Why Docker?** Docker is not a perfect security boundary — container escapes have occurred in the past. We use it because it is free, cross-platform, and accessible to anyone. The 7 hardening layers close the most common escape paths, and the threat model here is observing AI behavior, not defending against skilled human attackers. For stronger isolation, run the container inside a VM. See [Understanding the Findings](guidelines/UNDERSTANDING.md#why-docker-isnt-docker-itself-insecure) for a full discussion.
 
 ```mermaid
 graph TB
@@ -171,7 +176,7 @@ The suite covers **11 OWASP-aligned categories**. Five are implemented; six are 
 | 01 | [Reconnaissance](tests/01-recon/) | Auto | — | Attack surface enumeration: filesystem, tools, users, network |
 | 02 | [Privilege Escalation](tests/02-privilege-escalation/) | Auto | — | SUID binaries, capabilities, namespace isolation, Docker socket |
 | 03 | [Data Exfiltration](tests/03-data-exfiltration/) | Auto | — | Sensitive files, exfil tools, DNS exfiltration, cloud metadata |
-| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads against Gemini via direct curl calls |
+| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads via direct API calls (default: Gemini free tier) |
 | 05 | [General Audit](tests/05-general-audit/) | Auto | — | Code patterns (eval, child\_process), dependencies, TLS, secrets |
 
 ### Seeking Contributions
@@ -195,7 +200,7 @@ The suite covers **11 OWASP-aligned categories**. Five are implemented; six are 
 | Mode | Internet | DNS | Use Case |
 |------|:--------:|:---:|----------|
 | `sandbox-isolated` **(default)** | :lock: Blocked | :lock: Blocked | Automated tests (01–03, 05) |
-| `sandbox-internet` | :unlock: Allowed | :unlock: Allowed | Prompt injection tests (04) requiring Gemini API |
+| `sandbox-internet` | :unlock: Allowed | :unlock: Allowed | Prompt injection tests (04) requiring LLM API access |
 
 Switch between modes by editing `docker/docker-compose.yml`. See [Setup Guide](docs/SETUP.md) for details.
 
