@@ -1,0 +1,73 @@
+services:
+  openclaw-sandbox:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: openclaw-sandbox
+    stdin_open: true
+    tty: true
+
+    # --- Security Hardening ---
+
+    # Drop ALL Linux capabilities
+    cap_drop:
+      - ALL
+
+    # No new privileges via setuid/setgid binaries
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,uid=999,gid=999
+      - /home/openclaw/.openclaw:size=50M,uid=999,gid=999
+      - /home/openclaw/.npm:size=100M,uid=999,gid=999
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          memory: 512M
+
+    # Default: isolated network (no internet).
+    # Switch to sandbox-internet for LLM API testing (see docs/SETUP.md).
+    networks:
+      - sandbox-isolated
+
+    volumes:
+      - analysis-results:/home/openclaw/tests/results
+
+  # Optional: network traffic monitor sidecar
+  network-monitor:
+    image: nicolaka/netshoot:latest
+    container_name: openclaw-netmon
+    network_mode: "service:openclaw-sandbox"
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    command: >
+      tcpdump -i any -nn -l -w /captures/openclaw-traffic.pcap
+    volumes:
+      - network-captures:/captures
+    depends_on:
+      - openclaw-sandbox
+
+networks:
+  # No external/internet access — safe for automated tests
+  sandbox-isolated:
+    driver: bridge
+    internal: true
+
+  # Enable this for LLM API testing (prompt injection tests)
+  sandbox-internet:
+    driver: bridge
+
+volumes:
+  analysis-results:
+  network-captures:
