@@ -38,9 +38,6 @@ services:
     networks:
       - sandbox-isolated
 
-    volumes:
-      - analysis-results:/home/openclaw/tests/results
-
   # Optional: network traffic monitor sidecar
   network-monitor:
     image: nicolaka/netshoot:latest
@@ -69,5 +66,4 @@ networks:
     driver: bridge
 
 volumes:
-  analysis-results:
   network-captures:

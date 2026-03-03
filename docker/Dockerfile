@@ -23,6 +23,7 @@ RUN mkdir -p /home/openclaw/.openclaw /home/openclaw/workspace /home/openclaw/te
 
 # Copy test scripts into the container
 COPY --chown=openclaw:openclaw tests/ /home/openclaw/tests/
+COPY --chown=openclaw:openclaw scripts/ /home/openclaw/scripts/
 
 # Drop to non-root user
 USER openclaw

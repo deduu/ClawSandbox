@@ -127,6 +127,28 @@ docker exec -it openclaw-sandbox bash /home/openclaw/tests/03-data-exfiltration/
 docker exec -it openclaw-sandbox bash /home/openclaw/tests/05-general-audit/audit.sh
 ```
 
+### Viewing Results
+
+Test results are written to `/tmp/results/` inside the container (tmpfs). They are **ephemeral by design** — results disappear when the container stops, so review them during your session.
+
+```bash
+# List all result files
+docker exec openclaw-sandbox find /tmp/results -type f
+
+# Read the security audit summary
+docker exec openclaw-sandbox cat /tmp/results/05-general/summary.txt
+
+# Read results from a specific test suite
+docker exec openclaw-sandbox cat /tmp/results/02-privesc/capabilities.txt
+docker exec openclaw-sandbox cat /tmp/results/03-exfil/network-exfil.txt
+
+# Copy results to your host machine before stopping the container
+docker cp openclaw-sandbox:/tmp/results ./local-results
+```
+
+> [!TIP]
+> If you want to preserve results across sessions, use `docker cp` to copy them to your host before running `docker compose down`.
+
 ### Prompt Injection Tests
 
 Switch to the `sandbox-internet` network first (see [Setup Guide](docs/SETUP.md)), then choose one of the two approaches below.
