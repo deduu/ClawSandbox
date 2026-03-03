@@ -209,6 +209,8 @@ Switch between modes by editing `docker/docker-compose.yml`. See [Setup Guide](d
 | **[Architecture](docs/ARCHITECTURE.md)** | Container security layers, network modes, test structure, design rationale |
 | **[Contributing](docs/CONTRIBUTING.md)** | How to add tests, payload safety rules, results format |
 | **[Results](results/)** | Full test results with raw data and analysis |
+| **[Understanding the Findings](guidelines/UNDERSTANDING.md)** | Interpretive guide — what the results mean, how to read verdicts, limitations |
+| **[How to Engage](guidelines/ENGAGEMENT.md)** | Action-oriented guide — reviewing, reproducing, critiquing, contributing, citing |
 
 ---
 
