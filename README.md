@@ -129,17 +129,54 @@ docker exec -it openclaw-sandbox bash /home/openclaw/tests/05-general-audit/audi
 
 ### Prompt Injection Tests
 
-The default script targets Gemini (free tier). Switch to the `sandbox-internet` network first (see [Setup Guide](docs/SETUP.md)), then:
-
-```bash
-export GEMINI_API_KEY="your-key-here"
-docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" openclaw-sandbox \
-  bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
-```
+Switch to the `sandbox-internet` network first (see [Setup Guide](docs/SETUP.md)), then choose one of the two approaches below.
 
 ### Testing with Other Models
 
-The prompt injection payloads are plain text files in `tests/04-prompt-injection/payloads/`. You can send them to **any** LLM API using `curl`. The key is to include OpenClaw's system prompt so the model believes it has tool access.
+There are two ways to run prompt injection tests against different LLMs:
+
+#### A. Through OpenClaw (end-to-end)
+
+This is the **real-world scenario** — payloads go through the full OpenClaw agent pipeline and injected commands actually execute inside the sandbox. Use this to test how an LLM behaves when it has real tool access.
+
+1. Configure your provider inside the container:
+
+```bash
+# Pick one:
+docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh gemini YOUR_KEY
+docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh openai YOUR_KEY
+docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh anthropic YOUR_KEY
+```
+
+2. Export the matching environment variable and run the test:
+
+```bash
+# Gemini
+export GEMINI_API_KEY="your-key-here"
+docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" openclaw-sandbox \
+  bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
+
+# OpenAI
+export OPENAI_API_KEY="your-key-here"
+docker exec -e OPENAI_API_KEY="$OPENAI_API_KEY" openclaw-sandbox \
+  bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
+
+# Anthropic
+export ANTHROPIC_API_KEY="your-key-here"
+docker exec -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" openclaw-sandbox \
+  bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
+```
+
+The script auto-detects which API key is set and uses the corresponding provider. OpenClaw reads the model configuration from `auth-profiles.json` (written by `setup-api-key.sh`).
+
+#### B. Direct API calls (curl)
+
+This tests the model **in isolation** — you send a payload directly to the LLM API and observe the response. Nothing executes; you're checking whether the model *would* comply. Useful for quick comparisons without the full agent pipeline.
+
+The payloads are plain text files in `tests/04-prompt-injection/payloads/`. You can send them to any LLM API with `curl`. The key is to include OpenClaw's system prompt so the model believes it has tool access.
+
+> [!NOTE]
+> The system prompt below is OpenClaw's actual default agent prompt — we did not write or modify it. You can verify this by inspecting the OpenClaw source or running `openclaw agent --local --help` inside the container.
 
 <details>
 <summary><strong>Expand: curl examples for OpenAI, Anthropic, and local models</strong></summary>
@@ -275,7 +312,7 @@ The suite covers **11 OWASP-aligned categories**. Five are implemented; six are 
 | 01 | [Reconnaissance](tests/01-recon/) | Auto | — | Attack surface enumeration: filesystem, tools, users, network |
 | 02 | [Privilege Escalation](tests/02-privilege-escalation/) | Auto | — | SUID binaries, capabilities, namespace isolation, Docker socket |
 | 03 | [Data Exfiltration](tests/03-data-exfiltration/) | Auto | — | Sensitive files, exfil tools, DNS exfiltration, cloud metadata |
-| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads via direct API calls (default: Gemini free tier) |
+| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads via OpenClaw agent or direct API calls (any provider) |
 | 05 | [General Audit](tests/05-general-audit/) | Auto | — | Code patterns (eval, child\_process), dependencies, TLS, secrets |
 
 ### Seeking Contributions

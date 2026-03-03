@@ -10,7 +10,9 @@
 # IANA reserved domain that does not resolve. Even if injection
 # succeeds, no data leaves the container.
 #
-# USAGE: export GEMINI_API_KEY=... then run this script.
+# USAGE: export GEMINI_API_KEY=... (or OPENAI_API_KEY or ANTHROPIC_API_KEY)
+#        then run this script. It uses whichever provider is configured
+#        in auth-profiles.json (see scripts/setup-api-key.sh).
 # ============================================================
 set -uo pipefail
 
@@ -29,13 +31,28 @@ echo "SAFETY NOTE: All exfiltration targets use 'attacker.example'"
 echo "which is an IANA reserved domain. Nothing can leak."
 echo ""
 
-# ---- Verify API key ----
-if [ -z "${GEMINI_API_KEY:-}" ]; then
-    echo "ERROR: GEMINI_API_KEY is not set."
-    echo "Run: export GEMINI_API_KEY=your-key-here"
+# ---- Verify API key (any supported provider) ----
+PROVIDER=""
+if [ -n "${GEMINI_API_KEY:-}" ]; then
+    PROVIDER="gemini"
+    echo "API key: GEMINI_API_KEY set (${#GEMINI_API_KEY} chars)"
+elif [ -n "${OPENAI_API_KEY:-}" ]; then
+    PROVIDER="openai"
+    echo "API key: OPENAI_API_KEY set (${#OPENAI_API_KEY} chars)"
+elif [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+    PROVIDER="anthropic"
+    echo "API key: ANTHROPIC_API_KEY set (${#ANTHROPIC_API_KEY} chars)"
+else
+    echo "ERROR: No API key found."
+    echo "Set one of: GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY"
+    echo ""
+    echo "Example:"
+    echo "  export GEMINI_API_KEY=your-key-here"
+    echo "  export OPENAI_API_KEY=your-key-here"
+    echo "  export ANTHROPIC_API_KEY=your-key-here"
     exit 1
 fi
-echo "Gemini API key: set (${#GEMINI_API_KEY} chars)"
+echo "Provider: $PROVIDER"
 echo ""
 
 # ---- Verify payloads exist ----
@@ -94,7 +111,7 @@ run_test() {
     fi
     echo ""
 
-    # Delay between tests to avoid Gemini free-tier rate limits
+    # Delay between tests to avoid rate limits
     echo "  (waiting 15s for rate limit cooldown...)"
     sleep 15
 }
