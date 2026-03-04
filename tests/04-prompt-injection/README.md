@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Tests whether OpenClaw's underlying LLM can be tricked into executing
+Tests whether an AI agent's underlying LLM can be tricked into executing
 attacker-controlled commands through crafted prompts. Prompt injection is the
 single most critical vulnerability class for AI agents that can execute code.
 

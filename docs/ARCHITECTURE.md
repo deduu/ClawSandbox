@@ -6,7 +6,7 @@ This document describes the security architecture of the openclaw-sandbox, inclu
 
 ## Overview
 
-The openclaw-sandbox is a Docker-based environment designed to test the security posture of OpenClaw, an open-source AI agent with 215k+ GitHub stars. The sandbox provides a hardened, isolated container where OpenClaw is installed and subjected to automated security assessments and interactive prompt injection tests.
+The openclaw-sandbox is a Docker-based environment designed to test the security posture of AI agents with code execution capabilities. The reference implementation targets OpenClaw, an open-source AI agent with 215k+ GitHub stars, but the sandbox infrastructure, test categories, and methodology are designed for reuse with any agent. The sandbox provides a hardened, isolated container where the target agent is installed and subjected to automated security assessments and interactive prompt injection tests.
 
 The architecture follows a defense-in-depth approach: multiple independent security controls are layered so that the failure of any single control does not compromise the overall isolation.
 

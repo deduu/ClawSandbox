@@ -25,9 +25,7 @@ emails.
 
 ## Why This Is Dangerous
 
-OpenClaw and similar AI agents store configuration and memory as **plain
-markdown files** (`AGENTS.md`, `SKILLS.md`, conversation history, user
-preferences). These files are:
+AI agents like OpenClaw, Cursor, Claude Code, and MCP-based tools store configuration and memory as **plain text files** (`AGENTS.md`, `.cursorrules`, `CLAUDE.md`, MCP configs, conversation history, user preferences). These files are:
 
 1. **Read on every invocation** -- they become part of the system prompt or
    context window, directly shaping agent behavior.

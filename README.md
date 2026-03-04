@@ -2,26 +2,22 @@
 
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.svg">
-  <img alt="openclaw-sandbox" src="assets/logo-dark.svg" width="400">
-</picture>
+<img alt="openclaw-sandbox" src="assets/logo.png" width="400">
 
 <br><br>
 
-<strong>Security testing toolkit for AI agents that can execute code on your machine.</strong>
+<strong>Security benchmark for AI agents that can execute code on your machine.</strong>
 
 <br>
 
-<em>7 out of 9 adversarial attacks succeeded — including a silent config poisoning that persists across sessions with no user notification. Tested against Gemini 2.5 Flash (free tier), but the toolkit works with any LLM.</em>
+<em>A security benchmark for evaluating AI agent vulnerabilities — prompt injection, memory poisoning, privilege escalation, and data exfiltration. 7 of 9 attacks succeeded in the reference case study (OpenClaw + Gemini 2.5 Flash). Bring your own agent.</em>
 
 <br><br>
 
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
 <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Required-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"></a>
 <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/"><img src="https://img.shields.io/badge/OWASP-LLM%20Top%2010-orange?style=flat-square" alt="OWASP LLM Top 10"></a>
-<a href="https://github.com/ArcadeAI/OpenClaw"><img src="https://img.shields.io/badge/Target-OpenClaw-C83232?style=flat-square" alt="OpenClaw"></a>
+<a href="https://github.com/ArcadeAI/OpenClaw"><img src="https://img.shields.io/badge/Case%20Study-OpenClaw-C83232?style=flat-square" alt="OpenClaw"></a>
 <a href="https://github.com/deduu/openclaw-sandbox/stargazers"><img src="https://img.shields.io/github/stars/deduu/openclaw-sandbox?style=flat-square&color=yellow" alt="Stars"></a>
 
 <br><br>
@@ -38,9 +34,33 @@
 
 <br>
 
-## Key Findings
+## Why This Matters for All AI Agents
 
-All tests used **Gemini 2.5 Flash** with OpenClaw's default system prompt, which grants shell execution, file access, and personal data access with **no safety guardrails**. The toolkit is model-agnostic — you can test any LLM by changing the API endpoint.
+The vulnerabilities tested here are not specific to OpenClaw. Any AI agent that can execute shell commands, read/write files, or maintain persistent memory is exposed to the same attack classes:
+
+| Attack Class | Affected Agents | Why |
+|-------------|----------------|-----|
+| **Prompt Injection** | All LLM-based agents | The vulnerability lives in the model, not the framework |
+| **Memory Poisoning** | Any agent with persistent config/memory | `AGENTS.md`, `.cursorrules`, `CLAUDE.md`, MCP configs — same pattern |
+| **Privilege Escalation** | Any agent with system access | Container escapes, SUID abuse, capability exploitation |
+| **Data Exfiltration** | Any agent with network or file access | DNS tunneling, HTTP callbacks, file read + send |
+
+OpenClaw is the **reference case study** — the first agent tested end-to-end with published results. The test categories, sandbox infrastructure, and methodology are designed for reuse with any agent:
+
+- **AutoGPT** — shell execution + plugin system
+- **CrewAI** — multi-agent orchestration with tool access
+- **LangChain Agents** — tool-calling with arbitrary executors
+- **Claude Code / Cursor / Windsurf** — IDE agents with filesystem access
+- **Devin** — full development environment access
+- **Custom MCP-based agents** — any agent using Model Context Protocol tools
+
+> **To test your own agent:** Replace the system prompt in the test scripts with your agent's prompt, point the API calls at your provider, and run. See [Running Tests](#running-the-tests).
+
+---
+
+## Key Findings: OpenClaw Case Study
+
+The following results were collected using **OpenClaw v2026.2.26** with **Gemini 2.5 Flash** as the reference case study. OpenClaw's default system prompt grants shell execution, file access, and personal data access with **no safety guardrails** — a permission model shared by most AI agents with code execution capabilities. The benchmark is model-agnostic and agent-agnostic: swap the system prompt and API endpoint to test any agent/model combination.
 
 ### At a Glance
 
@@ -105,7 +125,7 @@ Full results with raw API responses: [results/prompt-injection.md](results/promp
 
 ### Memory & Config Poisoning (4 tests + 2 audits)
 
-AI agents like OpenClaw store configuration and memory as **plain markdown files** (`AGENTS.md`, `SKILLS.md`, notes). These files are read on every invocation, writable by the agent, and have **no integrity checks and no user notification when modified**. A single successful injection can permanently alter agent behavior.
+Many AI agents store configuration and memory as **plain text files** that are read on every invocation. OpenClaw uses `AGENTS.md`, `SKILLS.md`, and notes files; other agents use `.cursorrules`, `CLAUDE.md`, MCP server configs, or custom memory stores. The pattern is the same: writable by the agent, trusted without verification, and **no integrity checks or user notification when modified**. A single successful injection can permanently alter agent behavior.
 
 | # | Test | Technique | Result |
 |:---:|------|-----------|:------:|
@@ -168,7 +188,7 @@ The model (1) created the directory, (2) wrote a poisoned "system note" containi
 1. Attacker sends ONE prompt injection
 2. Model writes poisoned content to AGENTS.md / SKILLS.md / notes.md
 3. User sees a normal-looking response (split-attention)
-4. Next session: OpenClaw loads poisoned file as trusted config
+4. Next session: Agent loads poisoned file as trusted config
 5. Agent now follows attacker's instructions on EVERY future session
 6. No notification — no expiry — persists indefinitely
 ```
@@ -274,7 +294,7 @@ The suite covers **11 OWASP-aligned categories**. Six are implemented; five are 
 | 01 | [Reconnaissance](tests/01-recon/) | Auto | — | Attack surface enumeration: filesystem, tools, users, network |
 | 02 | [Privilege Escalation](tests/02-privilege-escalation/) | Auto | — | SUID binaries, capabilities, namespace isolation, Docker socket |
 | 03 | [Data Exfiltration](tests/03-data-exfiltration/) | Auto | — | Sensitive files, exfil tools, DNS exfiltration, cloud metadata |
-| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads via OpenClaw agent or direct API calls (any provider) |
+| 04 | [Prompt Injection](tests/04-prompt-injection/) | API | LLM01 | 5 adversarial payloads via agent CLI or direct API calls (any provider) |
 | 05 | [General Audit](tests/05-general-audit/) | Auto | — | Code patterns (eval, child\_process), dependencies, TLS, secrets |
 | 08 | [Memory Poisoning](tests/08-memory-poisoning/) | API + Auto | ASI06 | Config file injection (AGENTS.md, SKILLS.md), silent persistence, integrity audit |
 
@@ -285,7 +305,7 @@ The suite covers **11 OWASP-aligned categories**. Six are implemented; five are 
 
 | # | Category | OWASP | Planned Scope |
 |:---:|----------|-------|---------------|
-| 06 | [Tool Abuse](tests/06-tool-abuse/) | ASI02 | Abuse of OpenClaw's built-in tools (bash, file, web) |
+| 06 | [Tool Abuse](tests/06-tool-abuse/) | ASI02 | Abuse of agent-provided tools (bash, file, web) |
 | 07 | [Supply Chain](tests/07-supply-chain/) | — | Dependency poisoning, malicious npm packages |
 | 09 | [Session Hijacking](tests/09-session-hijacking/) | — | Session token theft, cross-session data leakage |
 | 10 | [Network / SSRF](tests/10-network-ssrf/) | — | Server-side request forgery via agent web browsing |
@@ -483,7 +503,7 @@ Switch between modes by editing `docker/docker-compose.yml`. See [Setup Guide](d
 ## Security Disclaimer
 
 > [!WARNING]
-> This toolkit is for **authorized security testing and educational purposes only**.
+> This benchmark is for **authorized security testing and educational purposes only**.
 >
 > - All test payloads use `attacker.example` — a domain permanently reserved by IANA ([RFC 2606](https://www.rfc-editor.org/rfc/rfc2606) / [RFC 6761](https://www.rfc-editor.org/rfc/rfc6761)) that will never resolve to a real server.
 > - No data is exfiltrated during testing.

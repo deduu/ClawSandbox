@@ -107,7 +107,7 @@ You do not need to write exploit code to contribute meaningfully:
 
 ### Researchers
 
-Fork the repository and extend it. The container configuration, test structure, and results format are designed for reuse. If you test additional models or frameworks, consider contributing results back.
+Fork the repository and extend it. The container configuration, test structure, and results format are designed for reuse. The benchmark is designed to test any AI agent — not just OpenClaw. Replace the system prompt and target configuration to produce comparable results for your agent of interest. If you test additional models or frameworks, consider contributing results back.
 
 ### Journalists
 
