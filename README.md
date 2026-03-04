@@ -208,27 +208,46 @@ The sandbox uses **7 independent security layers** following a defense-in-depth 
 
 ```mermaid
 graph TB
-    subgraph HOST["Host Machine"]
-        subgraph DOCKER["Docker Engine"]
-            subgraph NET["Network Layer"]
-                ISO["sandbox-isolated<br/>internal: true<br/>No internet access"]
+    subgraph HOST["<b>Host Machine</b>"]
+        subgraph DOCKER["<b>Docker Engine</b>"]
+            subgraph SEC["Security Controls"]
+                RO["Read-Only Root Filesystem"]
+                CAPS["All 41 Capabilities Dropped"]
+                NNP["no-new-privileges Flag"]
+                RES["2 CPU / 2GB RAM Limit"]
+            end
+            subgraph NET["Network Isolation"]
+                ISO["sandbox-isolated<br/>No internet access"]
                 INET["sandbox-internet<br/>LLM API access only"]
             end
-            RO["Read-Only Root Filesystem"]
-            CAPS["All 41 Capabilities Dropped"]
-            NNP["no-new-privileges Flag"]
-            RES["Resource Limits: 2 CPU / 2GB RAM"]
-            USER["Non-Root User UID 999"]
-            OC["OpenClaw Runtime"]
-            TESTS["Security Test Suite"]
-            SIDECAR["Network Monitor<br/>tcpdump packet capture"]
+            subgraph RUNTIME["Container Runtime"]
+                USER["Non-Root User UID 999"]
+                OC["Agent Runtime"]
+                TESTS["Security Test Suite"]
+            end
+            SIDECAR["Network Monitor<br/>tcpdump"]
         end
     end
 
-    USER --> OC
-    USER --> TESTS
-    SIDECAR -.-> OC
-    RO --- CAPS --- NNP --- RES
+    USER -->|runs| OC
+    USER -->|runs| TESTS
+    SIDECAR -.->|captures| OC
+
+    style HOST fill:#1a1a2e,stroke:#e94560,stroke-width:2px,color:#eee
+    style DOCKER fill:#16213e,stroke:#0f3460,stroke-width:2px,color:#eee
+    style SEC fill:#0f3460,stroke:#e94560,stroke-width:1px,color:#eee
+    style NET fill:#0f3460,stroke:#f5a623,stroke-width:1px,color:#eee
+    style RUNTIME fill:#0f3460,stroke:#00b4d8,stroke-width:1px,color:#eee
+    style RO fill:#e94560,stroke:#e94560,color:#fff
+    style CAPS fill:#e94560,stroke:#e94560,color:#fff
+    style NNP fill:#e94560,stroke:#e94560,color:#fff
+    style RES fill:#e94560,stroke:#e94560,color:#fff
+    style ISO fill:#f5a623,stroke:#f5a623,color:#000
+    style INET fill:#f5a623,stroke:#f5a623,color:#000
+    style USER fill:#00b4d8,stroke:#00b4d8,color:#fff
+    style OC fill:#00b4d8,stroke:#00b4d8,color:#fff
+    style TESTS fill:#00b4d8,stroke:#00b4d8,color:#fff
+    style SIDECAR fill:#7b2d8e,stroke:#7b2d8e,color:#fff
 ```
 
 <details>
