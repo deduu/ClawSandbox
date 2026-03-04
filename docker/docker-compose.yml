@@ -1,9 +1,9 @@
 services:
-  openclaw-sandbox:
+  ClawSandbox:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: openclaw-sandbox
+    container_name: ClawSandbox
     stdin_open: true
     tty: true
 
@@ -42,7 +42,7 @@ services:
   network-monitor:
     image: nicolaka/netshoot:latest
     container_name: openclaw-netmon
-    network_mode: "service:openclaw-sandbox"
+    network_mode: "service:ClawSandbox"
     cap_drop:
       - ALL
     cap_add:
@@ -53,7 +53,7 @@ services:
     volumes:
       - network-captures:/captures
     depends_on:
-      - openclaw-sandbox
+      - ClawSandbox
 
 networks:
   # No external/internet access — safe for automated tests

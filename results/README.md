@@ -83,7 +83,7 @@ Each results file follows a consistent structure: test environment, individual t
 ## How to Reproduce
 
 1. Clone the repo and build the container — see [Setup Guide](../docs/SETUP.md)
-2. Run automated tests (no API key needed): `docker exec openclaw-sandbox bash /home/openclaw/tests/run-all.sh`
+2. Run automated tests (no API key needed): `docker exec ClawSandbox bash /home/openclaw/tests/run-all.sh`
 3. Run prompt injection tests (API key required): see [README: Prompt Injection Tests](../README.md#prompt-injection-tests)
 
 ---

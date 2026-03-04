@@ -1,12 +1,12 @@
 # Architecture
 
-This document describes the security architecture of the openclaw-sandbox, including container hardening layers, network modes, the monitoring sidecar, test structure, and the rationale for using direct API calls.
+This document describes the security architecture of the ClawSandbox, including container hardening layers, network modes, the monitoring sidecar, test structure, and the rationale for using direct API calls.
 
 ---
 
 ## Overview
 
-The openclaw-sandbox is a Docker-based environment designed to test the security posture of AI agents with code execution capabilities. The reference implementation targets OpenClaw, an open-source AI agent with 215k+ GitHub stars, but the sandbox infrastructure, test categories, and methodology are designed for reuse with any agent. The sandbox provides a hardened, isolated container where the target agent is installed and subjected to automated security assessments and interactive prompt injection tests.
+The ClawSandbox is a Docker-based environment designed to test the security posture of AI agents with code execution capabilities. The reference implementation targets OpenClaw, an open-source AI agent with 215k+ GitHub stars, but the sandbox infrastructure, test categories, and methodology are designed for reuse with any agent. The sandbox provides a hardened, isolated container where the target agent is installed and subjected to automated security assessments and interactive prompt injection tests.
 
 The architecture follows a defense-in-depth approach: multiple independent security controls are layered so that the failure of any single control does not compromise the overall isolation.
 
@@ -117,7 +117,7 @@ sandbox-internet:
 - **DNS:** Available via Docker's default DNS resolver.
 - **Use when:** Running LLM-based prompt injection tests that need to call cloud APIs.
 
-To switch between modes, edit the `networks` list under the `openclaw-sandbox` service in `docker/docker-compose.yml` and restart the container. See [docs/SETUP.md](SETUP.md) for detailed instructions.
+To switch between modes, edit the `networks` list under the `ClawSandbox` service in `docker/docker-compose.yml` and restart the container. See [docs/SETUP.md](SETUP.md) for detailed instructions.
 
 ---
 
@@ -127,7 +127,7 @@ To switch between modes, edit the `networks` list under the `openclaw-sandbox` s
 network-monitor:
   image: nicolaka/netshoot:latest
   container_name: openclaw-netmon
-  network_mode: "service:openclaw-sandbox"
+  network_mode: "service:ClawSandbox"
   cap_drop:
     - ALL
   cap_add:
@@ -139,7 +139,7 @@ network-monitor:
     - network-captures:/captures
 ```
 
-A `netshoot`-based sidecar container runs alongside the main sandbox. It shares the network namespace of the `openclaw-sandbox` container (`network_mode: "service:openclaw-sandbox"`) and captures all network traffic using `tcpdump`.
+A `netshoot`-based sidecar container runs alongside the main sandbox. It shares the network namespace of the `ClawSandbox` container (`network_mode: "service:ClawSandbox"`) and captures all network traffic using `tcpdump`.
 
 **Purpose:**
 

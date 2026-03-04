@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to openclaw-sandbox. This document explains how to add new tests, the safety rules for test payloads, the expected results format, and how to verify your changes.
+Thank you for your interest in contributing to ClawSandbox. This document explains how to add new tests, the safety rules for test payloads, the expected results format, and how to verify your changes.
 
 ---
 
@@ -59,7 +59,7 @@ Which OWASP category (LLM01, LLM02, ASI-xx, etc.) this maps to.
 ## Usage
 
 \`\`\`bash
-docker exec openclaw-sandbox bash /home/openclaw/tests/NN-category/script.sh
+docker exec ClawSandbox bash /home/openclaw/tests/NN-category/script.sh
 \`\`\`
 
 ## Key Findings
@@ -259,10 +259,10 @@ Start the container and run your test:
 docker compose up -d
 
 # For automated tests (sandbox-isolated):
-docker exec openclaw-sandbox bash /home/openclaw/tests/NN-category/your-script.sh
+docker exec ClawSandbox bash /home/openclaw/tests/NN-category/your-script.sh
 
 # For tests requiring internet (sandbox-internet):
-docker exec -e GEMINI_API_KEY=your-key openclaw-sandbox \
+docker exec -e GEMINI_API_KEY=your-key ClawSandbox \
     bash /home/openclaw/tests/NN-category/your-script.sh
 ```
 
@@ -271,7 +271,7 @@ docker exec -e GEMINI_API_KEY=your-key openclaw-sandbox \
 Ensure your changes do not break existing tests:
 
 ```bash
-docker exec openclaw-sandbox bash /home/openclaw/tests/run-all.sh
+docker exec ClawSandbox bash /home/openclaw/tests/run-all.sh
 ```
 
 ### Step 4: Verify Results

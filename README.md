@@ -1,8 +1,8 @@
-<a id="openclaw-sandbox"></a>
+<a id="ClawSandbox"></a>
 
 <div align="center">
 
-<img alt="openclaw-sandbox" src="assets/logo.png" width="400">
+<img alt="ClawSandbox" src="assets/logo.png" width="400">
 
 <br><br>
 
@@ -18,7 +18,7 @@
 <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Required-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"></a>
 <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/"><img src="https://img.shields.io/badge/OWASP-LLM%20Top%2010-orange?style=flat-square" alt="OWASP LLM Top 10"></a>
 <a href="https://github.com/ArcadeAI/OpenClaw"><img src="https://img.shields.io/badge/Case%20Study-OpenClaw-C83232?style=flat-square" alt="OpenClaw"></a>
-<a href="https://github.com/deduu/openclaw-sandbox/stargazers"><img src="https://img.shields.io/github/stars/deduu/openclaw-sandbox?style=flat-square&color=yellow" alt="Stars"></a>
+<a href="https://github.com/deduu/ClawSandbox/stargazers"><img src="https://img.shields.io/github/stars/deduu/ClawSandbox?style=flat-square&color=yellow" alt="Stars"></a>
 
 <br><br>
 
@@ -288,11 +288,11 @@ Full findings: [results/code-audit.md](results/code-audit.md)
 
 ```bash
 # Clone and build the hardened container
-git clone https://github.com/deduu/openclaw-sandbox.git
-cd openclaw-sandbox/docker && docker compose build
+git clone https://github.com/deduu/ClawSandbox.git
+cd ClawSandbox/docker && docker compose build
 
 # Run the automated security test suite (no internet/API keys needed)
-docker compose up -d && docker exec -it openclaw-sandbox bash /home/openclaw/tests/run-all.sh
+docker compose up -d && docker exec -it ClawSandbox bash /home/openclaw/tests/run-all.sh
 ```
 
 > [!NOTE]
@@ -340,13 +340,13 @@ These run entirely inside the isolated container — no internet, no API keys, n
 
 ```bash
 # Run everything (categories 01-03, 05)
-docker exec -it openclaw-sandbox bash /home/openclaw/tests/run-all.sh
+docker exec -it ClawSandbox bash /home/openclaw/tests/run-all.sh
 
 # Or run individual categories
-docker exec -it openclaw-sandbox bash /home/openclaw/tests/01-recon/recon.sh
-docker exec -it openclaw-sandbox bash /home/openclaw/tests/02-privilege-escalation/privesc.sh
-docker exec -it openclaw-sandbox bash /home/openclaw/tests/03-data-exfiltration/exfil.sh
-docker exec -it openclaw-sandbox bash /home/openclaw/tests/05-general-audit/audit.sh
+docker exec -it ClawSandbox bash /home/openclaw/tests/01-recon/recon.sh
+docker exec -it ClawSandbox bash /home/openclaw/tests/02-privilege-escalation/privesc.sh
+docker exec -it ClawSandbox bash /home/openclaw/tests/03-data-exfiltration/exfil.sh
+docker exec -it ClawSandbox bash /home/openclaw/tests/05-general-audit/audit.sh
 ```
 
 ### Memory Poisoning Tests (API key needed)
@@ -355,11 +355,11 @@ Switch to `sandbox-internet` network first (see [Setup Guide](docs/SETUP.md)), t
 
 ```bash
 # Offline audit (no API key — tests file writability and integrity checks)
-docker exec openclaw-sandbox bash /home/openclaw/tests/08-memory-poisoning/memory-poison-offline.sh
+docker exec ClawSandbox bash /home/openclaw/tests/08-memory-poisoning/memory-poison-offline.sh
 
 # API tests (requires Gemini key)
 export GEMINI_API_KEY="your-key-here"
-docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" openclaw-sandbox \
+docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" ClawSandbox \
   bash /home/openclaw/tests/08-memory-poisoning/memory-poison-api.sh
 ```
 
@@ -369,10 +369,10 @@ Test results are written to `/tmp/results/` inside the container (tmpfs). They a
 
 ```bash
 # List all result files
-docker exec openclaw-sandbox find /tmp/results -type f
+docker exec ClawSandbox find /tmp/results -type f
 
 # Copy results to your host machine before stopping the container
-docker cp openclaw-sandbox:/tmp/results ./local-results
+docker cp ClawSandbox:/tmp/results ./local-results
 ```
 
 > [!TIP]
@@ -397,9 +397,9 @@ This is the **real-world scenario** — payloads go through the full OpenClaw ag
 
 ```bash
 # Pick one:
-docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh gemini YOUR_KEY
-docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh openai YOUR_KEY
-docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh anthropic YOUR_KEY
+docker exec -it ClawSandbox bash scripts/setup-api-key.sh gemini YOUR_KEY
+docker exec -it ClawSandbox bash scripts/setup-api-key.sh openai YOUR_KEY
+docker exec -it ClawSandbox bash scripts/setup-api-key.sh anthropic YOUR_KEY
 ```
 
 2. Export the matching environment variable and run the test:
@@ -407,17 +407,17 @@ docker exec -it openclaw-sandbox bash scripts/setup-api-key.sh anthropic YOUR_KE
 ```bash
 # Gemini
 export GEMINI_API_KEY="your-key-here"
-docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" openclaw-sandbox \
+docker exec -e GEMINI_API_KEY="$GEMINI_API_KEY" ClawSandbox \
   bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
 
 # OpenAI
 export OPENAI_API_KEY="your-key-here"
-docker exec -e OPENAI_API_KEY="$OPENAI_API_KEY" openclaw-sandbox \
+docker exec -e OPENAI_API_KEY="$OPENAI_API_KEY" ClawSandbox \
   bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
 
 # Anthropic
 export ANTHROPIC_API_KEY="your-key-here"
-docker exec -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" openclaw-sandbox \
+docker exec -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" ClawSandbox \
   bash /home/openclaw/tests/04-prompt-injection/run-via-openclaw.sh
 ```
 
@@ -544,6 +544,6 @@ Switch between modes by editing `docker/docker-compose.yml`. See [Setup Guide](d
 
 <div align="right">
 
-<a href="#openclaw-sandbox">Back to top</a>
+<a href="#ClawSandbox">Back to top</a>
 
 </div>

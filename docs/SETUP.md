@@ -1,6 +1,6 @@
 # Setup Guide
 
-Step-by-step instructions for building and running the openclaw-sandbox security testing toolkit.
+Step-by-step instructions for building and running the ClawSandbox security testing toolkit.
 
 ---
 
@@ -30,8 +30,8 @@ The default test scripts target the Gemini API. If you use a different provider,
 ## Clone the Repository
 
 ```bash
-git clone https://github.com/deduu/openclaw-sandbox.git
-cd openclaw-sandbox
+git clone https://github.com/deduu/ClawSandbox.git
+cd ClawSandbox
 ```
 
 ---
@@ -62,7 +62,7 @@ The automated test suite (categories 01-03 and 05) runs entirely inside the cont
 
 ### Step 1: Ensure the Isolated Network Is Selected
 
-Open `docker/docker-compose.yml` and verify the `networks` section under the `openclaw-sandbox` service uses `sandbox-isolated`:
+Open `docker/docker-compose.yml` and verify the `networks` section under the `ClawSandbox` service uses `sandbox-isolated`:
 
 ```yaml
     networks:
@@ -80,7 +80,7 @@ docker compose up -d
 ### Step 3: Run the Tests
 
 ```bash
-docker exec openclaw-sandbox bash /home/openclaw/tests/run-all.sh
+docker exec ClawSandbox bash /home/openclaw/tests/run-all.sh
 ```
 
 The test runner executes all automated scripts sequentially and writes results to `/tmp/results/` inside the container. Output is also printed to your terminal via `tee`.
@@ -90,10 +90,10 @@ The test runner executes all automated scripts sequentially and writes results t
 Results are stored inside the container. To read them:
 
 ```bash
-docker exec openclaw-sandbox cat /tmp/results/recon.log
-docker exec openclaw-sandbox cat /tmp/results/privesc.log
-docker exec openclaw-sandbox cat /tmp/results/exfil.log
-docker exec openclaw-sandbox cat /tmp/results/audit.log
+docker exec ClawSandbox cat /tmp/results/recon.log
+docker exec ClawSandbox cat /tmp/results/privesc.log
+docker exec ClawSandbox cat /tmp/results/exfil.log
+docker exec ClawSandbox cat /tmp/results/audit.log
 ```
 
 ---
@@ -104,7 +104,7 @@ Prompt injection tests (category 04) require outbound internet access to reach t
 
 ### Step 1: Switch to the Internet-Enabled Network
 
-Edit `docker/docker-compose.yml` and change the `networks` section under the `openclaw-sandbox` service:
+Edit `docker/docker-compose.yml` and change the `networks` section under the `ClawSandbox` service:
 
 ```yaml
     # Change this:
@@ -120,7 +120,7 @@ Edit `docker/docker-compose.yml` and change the `networks` section under the `op
 
 Set your Gemini API key as an environment variable. You can either:
 
-**Option A:** Add it to the `docker-compose.yml` under the `openclaw-sandbox` service:
+**Option A:** Add it to the `docker-compose.yml` under the `ClawSandbox` service:
 
 ```yaml
     environment:
@@ -130,7 +130,7 @@ Set your Gemini API key as an environment variable. You can either:
 **Option B:** Pass it at runtime via `docker exec`:
 
 ```bash
-docker exec -e GEMINI_API_KEY=your-key-here openclaw-sandbox \
+docker exec -e GEMINI_API_KEY=your-key-here ClawSandbox \
     bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
 ```
 
@@ -145,7 +145,7 @@ docker compose up -d
 ### Step 4: Run the Prompt Injection Tests
 
 ```bash
-docker exec -e GEMINI_API_KEY=your-key-here openclaw-sandbox \
+docker exec -e GEMINI_API_KEY=your-key-here ClawSandbox \
     bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
 ```
 
@@ -184,7 +184,7 @@ networks:
     driver: bridge
 ```
 
-To switch, change the `networks` list under the `openclaw-sandbox` service:
+To switch, change the `networks` list under the `ClawSandbox` service:
 
 | Network | Use Case | Internet Access |
 |---|---|---|
@@ -242,7 +242,7 @@ The `docker-compose.yml` configures tmpfs with `uid=999,gid=999` to match the `o
 If your system assigns a different UID/GID to the `openclaw` user, check with:
 
 ```bash
-docker exec openclaw-sandbox id
+docker exec ClawSandbox id
 ```
 
 Then update the `uid` and `gid` values in the tmpfs configuration to match.
@@ -258,14 +258,14 @@ If `docker compose up -d` fails:
 1. Ensure Docker is running: `docker info`
 2. Check for port conflicts: `docker ps`
 3. Rebuild from scratch: `docker compose build --no-cache`
-4. Check logs: `docker compose logs openclaw-sandbox`
+4. Check logs: `docker compose logs ClawSandbox`
 
 ### Tests Produce No Output
 
 If `run-all.sh` completes but produces no log files, ensure the results directory is writable:
 
 ```bash
-docker exec openclaw-sandbox ls -la /tmp/results/
+docker exec ClawSandbox ls -la /tmp/results/
 ```
 
 The `/tmp` directory is a tmpfs mount and should be writable by the `openclaw` user.

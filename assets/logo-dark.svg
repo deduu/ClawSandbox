@@ -154,8 +154,8 @@
   <rect x="370" y="148" width="4" height="4" rx="1" fill="#C83232" opacity="0.4"/>
   <rect x="390" y="150" width="3" height="3" rx="1" fill="#C83232" opacity="0.3"/>
 
-  <!-- Text: openclaw-sandbox -->
-  <text x="240" y="198" text-anchor="middle" font-family="'Courier New', Courier, monospace" font-size="22" font-weight="bold" fill="#ffffff" letter-spacing="1">openclaw-sandbox</text>
+  <!-- Text: ClawSandbox -->
+  <text x="240" y="198" text-anchor="middle" font-family="'Courier New', Courier, monospace" font-size="22" font-weight="bold" fill="#ffffff" letter-spacing="1">ClawSandbox</text>
 
   <!-- Subtitle -->
   <text x="240" y="214" text-anchor="middle" font-family="'Courier New', Courier, monospace" font-size="10" fill="#C83232" letter-spacing="0.5">security testing for AI agents</text>

@@ -1,6 +1,6 @@
 # Methodology
 
-This document describes the testing methodology used in openclaw-sandbox: what we test, how we test it, how results are classified, and what the limitations are. It is the authoritative reference for understanding why the test suite is designed the way it is.
+This document describes the testing methodology used in ClawSandbox: what we test, how we test it, how results are classified, and what the limitations are. It is the authoritative reference for understanding why the test suite is designed the way it is.
 
 For how to *run* the tests, see [Setup Guide](SETUP.md). For how to *interpret* the results, see [Understanding the Findings](../guidelines/UNDERSTANDING.md).
 

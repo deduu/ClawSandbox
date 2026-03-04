@@ -1,6 +1,6 @@
 # Understanding the Project and Its Findings
 
-This guide explains what openclaw-sandbox tested, what it found, and what those findings mean. It is written for anyone — security researchers, developers, policymakers, journalists, or curious readers — who wants to form an informed opinion about AI agent security.
+This guide explains what ClawSandbox tested, what it found, and what those findings mean. It is written for anyone — security researchers, developers, policymakers, journalists, or curious readers — who wants to form an informed opinion about AI agent security.
 
 For how to take action on what you read here, see [ENGAGEMENT.md](ENGAGEMENT.md).
 
@@ -8,7 +8,7 @@ For how to take action on what you read here, see [ENGAGEMENT.md](ENGAGEMENT.md)
 
 ## What This Project Found
 
-openclaw-sandbox sent 5 deceptive messages to an AI agent (Gemini 2.5 Flash running inside [OpenClaw](https://github.com/nicholasgriffintn/openclaw)) and observed what happened. Three of those messages succeeded — the model followed malicious instructions it should have refused.
+ClawSandbox sent 5 deceptive messages to an AI agent (Gemini 2.5 Flash running inside [OpenClaw](https://github.com/nicholasgriffintn/openclaw)) and observed what happened. Three of those messages succeeded — the model followed malicious instructions it should have refused.
 
 The most severe result: a message claiming to be a "SYSTEM OVERRIDE" convinced the model to read a credential file and output API keys. In a live environment with real credentials, this would be a complete account compromise from a single message.
 
