@@ -3,9 +3,7 @@
 <div align="center">
 
 <img alt="ClawSandbox" src="assets/logo.png" width="400">
-
-<br><br>
-
+<br>
 <strong>Security benchmark for AI agents that can execute code on your machine.</strong>
 
 <br>
