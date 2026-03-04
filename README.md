@@ -198,7 +198,7 @@ This tests the model **in isolation** — you send a payload directly to the LLM
 The payloads are plain text files in `tests/04-prompt-injection/payloads/`. You can send them to any LLM API with `curl`. The key is to include OpenClaw's system prompt so the model believes it has tool access.
 
 > [!NOTE]
-> The system prompt below is OpenClaw's actual default agent prompt — we did not write or modify it. You can verify this by inspecting the OpenClaw source or running `openclaw agent --local --help` inside the container.
+> The system prompt below is OpenClaw's actual default agent prompt — we did not write or modify it. You can verify this by inspecting OpenClaw's source files (`SOUL.md` and `AGENTS.md` in the npm package) or by running `openclaw agent --local --message "hello" --verbose on --json` and examining the system instruction in the request payload.
 
 <details>
 <summary><strong>Expand: curl examples for OpenAI, Anthropic, and local models</strong></summary>
@@ -370,6 +370,7 @@ Switch between modes by editing `docker/docker-compose.yml`. See [Setup Guide](d
 |----------|-------------|
 | **[Setup Guide](docs/SETUP.md)** | Prerequisites, build instructions, running tests, troubleshooting |
 | **[Architecture](docs/ARCHITECTURE.md)** | Container security layers, network modes, test structure, design rationale |
+| **[Methodology](docs/METHODOLOGY.md)** | Threat model, test design rationale, safety controls, result classification, limitations |
 | **[Contributing](docs/CONTRIBUTING.md)** | How to add tests, payload safety rules, results format |
 | **[Results](results/)** | Full test results with raw data and analysis |
 | **[Understanding the Findings](guidelines/UNDERSTANDING.md)** | Interpretive guide — what the results mean, how to read verdicts, limitations |

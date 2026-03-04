@@ -82,12 +82,9 @@ When using the `sandbox-isolated` network (the default), all outbound traffic is
 
 ### 7. No Host Mounts
 
-```yaml
-volumes:
-  - analysis-results:/home/openclaw/tests/results
-```
+The main sandbox service uses no named volumes or bind mounts to host directories. Writable storage is provided exclusively by tmpfs mounts (see section 3 above). The only named volume in the compose file is `network-captures`, used by the network monitor sidecar to store packet captures.
 
-The container uses only named Docker volumes -- not bind mounts to host directories. There is no access to the host filesystem, the Docker socket, or any host devices. This prevents container escape via filesystem traversal and blocks access to host secrets, SSH keys, cloud credentials, or other sensitive files.
+There is no access to the host filesystem, the Docker socket, or any host devices. This prevents container escape via filesystem traversal and blocks access to host secrets, SSH keys, cloud credentials, or other sensitive files.
 
 ---
 
