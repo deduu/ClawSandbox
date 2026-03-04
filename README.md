@@ -189,29 +189,27 @@ The sandbox uses **7 independent security layers** following a defense-in-depth 
 ```mermaid
 graph TB
     subgraph HOST["Host Machine"]
-        direction TB
         subgraph DOCKER["Docker Engine"]
             subgraph NET["Network Layer"]
-                ISO["sandbox-isolated\n(internal: true)\nNo internet access"]
-                INET["sandbox-internet\nLLM API access only"]
+                ISO["sandbox-isolated<br/>internal: true<br/>No internet access"]
+                INET["sandbox-internet<br/>LLM API access only"]
             end
             subgraph CONTAINER["openclaw-sandbox"]
-                direction TB
                 RO["Read-Only Root Filesystem"]
                 CAPS["All 41 Capabilities Dropped"]
                 NNP["no-new-privileges Flag"]
                 RES["Resource Limits: 2 CPU / 2GB RAM"]
-                subgraph USER["Non-Root User (UID 999)"]
+                subgraph USER["Non-Root User UID 999"]
                     OC["OpenClaw Runtime"]
                     TESTS["Security Test Suite"]
                 end
             end
-            SIDECAR["Network Monitor\ntcpdump packet capture"]
+            SIDECAR["Network Monitor<br/>tcpdump packet capture"]
         end
     end
 
-    CONTAINER ---|"Named volumes only\nNo host bind mounts"| HOST
-    SIDECAR ---|"Shares network\nnamespace"| CONTAINER
+    CONTAINER --- HOST
+    SIDECAR --- CONTAINER
 ```
 
 <details>
