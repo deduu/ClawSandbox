@@ -207,47 +207,48 @@ The sandbox uses **7 independent security layers** following a defense-in-depth 
 > **Why Docker?** Docker is not a perfect security boundary — container escapes have occurred in the past. We use it because it is free, cross-platform, and accessible to anyone. The 7 hardening layers close the most common escape paths, and the threat model here is observing AI behavior, not defending against skilled human attackers. For stronger isolation, run the container inside a VM. See [Understanding the Findings](guidelines/UNDERSTANDING.md#why-docker-isnt-docker-itself-insecure) for a full discussion.
 
 ```mermaid
-graph TB
-    subgraph HOST["<b>Host Machine</b>"]
-        subgraph DOCKER["<b>Docker Engine</b>"]
-            subgraph SEC["Security Controls"]
-                RO["Read-Only Root Filesystem"]
-                CAPS["All 41 Capabilities Dropped"]
-                NNP["no-new-privileges Flag"]
-                RES["2 CPU / 2GB RAM Limit"]
+graph LR
+    subgraph HOST[" Host Machine "]
+        subgraph DOCKER[" Docker Engine "]
+            direction TB
+            subgraph SEC["🔒 Security Controls"]
+                RO["Read-Only Root FS"]
+                CAPS["All 41 Caps Dropped"]
+                NNP["no-new-privileges"]
+                RES["2 CPU / 2GB RAM"]
             end
-            subgraph NET["Network Isolation"]
-                ISO["sandbox-isolated<br/>No internet access"]
-                INET["sandbox-internet<br/>LLM API access only"]
+            subgraph NET["🌐 Network"]
+                ISO["Isolated — No internet"]
+                INET["Internet — API only"]
             end
-            subgraph RUNTIME["Container Runtime"]
-                USER["Non-Root User UID 999"]
+            subgraph RUN["⚙️ Runtime"]
+                USER["Non-Root UID 999"]
                 OC["Agent Runtime"]
-                TESTS["Security Test Suite"]
+                TESTS["Test Suite"]
             end
-            SIDECAR["Network Monitor<br/>tcpdump"]
+            SIDECAR["📡 Network Monitor"]
         end
     end
 
-    USER -->|runs| OC
-    USER -->|runs| TESTS
-    SIDECAR -.->|captures| OC
+    USER --> OC
+    USER --> TESTS
+    SIDECAR -.-> RUN
 
-    style HOST fill:#1a1a2e,stroke:#e94560,stroke-width:2px,color:#eee
-    style DOCKER fill:#16213e,stroke:#0f3460,stroke-width:2px,color:#eee
-    style SEC fill:#0f3460,stroke:#e94560,stroke-width:1px,color:#eee
-    style NET fill:#0f3460,stroke:#f5a623,stroke-width:1px,color:#eee
-    style RUNTIME fill:#0f3460,stroke:#00b4d8,stroke-width:1px,color:#eee
-    style RO fill:#e94560,stroke:#e94560,color:#fff
-    style CAPS fill:#e94560,stroke:#e94560,color:#fff
-    style NNP fill:#e94560,stroke:#e94560,color:#fff
-    style RES fill:#e94560,stroke:#e94560,color:#fff
-    style ISO fill:#f5a623,stroke:#f5a623,color:#000
-    style INET fill:#f5a623,stroke:#f5a623,color:#000
-    style USER fill:#00b4d8,stroke:#00b4d8,color:#fff
-    style OC fill:#00b4d8,stroke:#00b4d8,color:#fff
-    style TESTS fill:#00b4d8,stroke:#00b4d8,color:#fff
-    style SIDECAR fill:#7b2d8e,stroke:#7b2d8e,color:#fff
+    style HOST fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style DOCKER fill:#e9ecef,stroke:#495057,stroke-width:2px,color:#212529
+    style SEC fill:#fce4ec,stroke:#c62828,stroke-width:2px,color:#212529
+    style NET fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#212529
+    style RUN fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#212529
+    style RO fill:#ef9a9a,stroke:#c62828,color:#212529
+    style CAPS fill:#ef9a9a,stroke:#c62828,color:#212529
+    style NNP fill:#ef9a9a,stroke:#c62828,color:#212529
+    style RES fill:#ef9a9a,stroke:#c62828,color:#212529
+    style ISO fill:#ffcc80,stroke:#e65100,color:#212529
+    style INET fill:#ffcc80,stroke:#e65100,color:#212529
+    style USER fill:#90caf9,stroke:#1565c0,color:#212529
+    style OC fill:#90caf9,stroke:#1565c0,color:#212529
+    style TESTS fill:#90caf9,stroke:#1565c0,color:#212529
+    style SIDECAR fill:#ce93d8,stroke:#6a1b9a,color:#212529
 ```
 
 <details>
