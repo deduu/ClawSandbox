@@ -16,7 +16,7 @@
 <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Required-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"></a>
 <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/"><img src="https://img.shields.io/badge/OWASP-LLM%20Top%2010-orange?style=flat-square" alt="OWASP LLM Top 10"></a>
 <a href="https://github.com/ArcadeAI/OpenClaw"><img src="https://img.shields.io/badge/Case%20Study-OpenClaw-C83232?style=flat-square" alt="OpenClaw"></a>
-<a href="https://github.com/deduu/ClawSandbox/stargazers"><img src="https://img.shields.io/github/stars/deduu/ClawSandbox?style=flat-square&color=yellow" alt="Stars"></a>
+<a href="https://github.com/deduu/ClawSandbox/stargazers"><img src="https://img.shields.io/github/stars/deduu/clawsandbox?style=flat-square&color=yellow" alt="Stars"></a>
 
 <br><br>
 
