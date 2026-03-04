@@ -194,22 +194,21 @@ graph TB
                 ISO["sandbox-isolated<br/>internal: true<br/>No internet access"]
                 INET["sandbox-internet<br/>LLM API access only"]
             end
-            subgraph CONTAINER["openclaw-sandbox"]
-                RO["Read-Only Root Filesystem"]
-                CAPS["All 41 Capabilities Dropped"]
-                NNP["no-new-privileges Flag"]
-                RES["Resource Limits: 2 CPU / 2GB RAM"]
-                subgraph USER["Non-Root User UID 999"]
-                    OC["OpenClaw Runtime"]
-                    TESTS["Security Test Suite"]
-                end
-            end
+            RO["Read-Only Root Filesystem"]
+            CAPS["All 41 Capabilities Dropped"]
+            NNP["no-new-privileges Flag"]
+            RES["Resource Limits: 2 CPU / 2GB RAM"]
+            USER["Non-Root User UID 999"]
+            OC["OpenClaw Runtime"]
+            TESTS["Security Test Suite"]
             SIDECAR["Network Monitor<br/>tcpdump packet capture"]
         end
     end
 
-    CONTAINER --- HOST
-    SIDECAR --- CONTAINER
+    USER --> OC
+    USER --> TESTS
+    SIDECAR -.-> OC
+    RO --- CAPS --- NNP --- RES
 ```
 
 <details>
