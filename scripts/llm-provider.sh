@@ -72,7 +72,7 @@ case "$LLM_PROVIDER" in
         ;;
     openai)
         LLM_MODEL="${OPENAI_MODEL:-gpt-4o}"
-        LLM_RATE_LIMIT_PATTERN="rate_limit\|Rate limit\|429\|Too Many Requests"
+        LLM_RATE_LIMIT_PATTERN="rate_limit_exceeded\|Rate limit reached\|429\|Too Many Requests"
         ;;
     anthropic)
         LLM_MODEL="${ANTHROPIC_MODEL:-claude-sonnet-4-20250514}"
