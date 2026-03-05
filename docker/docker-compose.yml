@@ -1,5 +1,6 @@
 services:
   ClawSandbox:
+    image: clawsandbox:latest
     build:
       context: ..
       dockerfile: docker/Dockerfile

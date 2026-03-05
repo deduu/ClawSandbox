@@ -23,7 +23,7 @@ Prompt injection tests call an LLM API directly. You need an API key from at lea
 - **OpenAI** -- Requires a paid account. Set `OPENAI_API_KEY` instead.
 - **Anthropic** -- Requires a paid account. Set `ANTHROPIC_API_KEY` instead.
 
-The default test scripts target the Gemini API. If you use a different provider, you will need to modify `tests/04-prompt-injection/run-via-api.sh`.
+The API test scripts auto-detect which provider to use based on which environment variable is set. No script modifications needed.
 
 ---
 
@@ -100,7 +100,7 @@ docker exec ClawSandbox cat /tmp/results/audit.log
 
 ## Run Prompt Injection Tests (Internet Needed)
 
-Prompt injection tests (category 04) require outbound internet access to reach the Gemini API. These tests send adversarial payloads to the LLM and analyze the responses.
+Prompt injection tests (category 04) require outbound internet access to reach the LLM API. These tests send adversarial payloads to the LLM and analyze the responses. The scripts auto-detect the provider from whichever API key is set.
 
 ### Step 1: Switch to the Internet-Enabled Network
 
@@ -118,20 +118,29 @@ Edit `docker/docker-compose.yml` and change the `networks` section under the `Cl
 
 ### Step 2: Configure Your API Key
 
-Set your Gemini API key as an environment variable. You can either:
+Set your API key as an environment variable. Pass it at runtime via `docker exec`:
 
-**Option A:** Add it to the `docker-compose.yml` under the `ClawSandbox` service:
+```bash
+# Gemini (recommended — free tier available)
+docker exec -e GEMINI_API_KEY=your-key-here ClawSandbox \
+    bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
+
+# OpenAI (with optional custom base URL for proxies/compatible APIs)
+docker exec -e OPENAI_API_KEY=your-key-here \
+             -e OPENAI_BASE_URL=https://your-proxy.example.com \
+             ClawSandbox \
+    bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
+
+# Anthropic
+docker exec -e ANTHROPIC_API_KEY=your-key-here ClawSandbox \
+    bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
+```
+
+Or add the key to `docker-compose.yml` under the `ClawSandbox` service:
 
 ```yaml
     environment:
-      - GEMINI_API_KEY=your-key-here
-```
-
-**Option B:** Pass it at runtime via `docker exec`:
-
-```bash
-docker exec -e GEMINI_API_KEY=your-key-here ClawSandbox \
-    bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
+      - GEMINI_API_KEY=your-key-here    # or OPENAI_API_KEY or ANTHROPIC_API_KEY
 ```
 
 ### Step 3: Rebuild and Restart
@@ -145,11 +154,12 @@ docker compose up -d
 ### Step 4: Run the Prompt Injection Tests
 
 ```bash
+# Use whichever provider key you configured in Step 2
 docker exec -e GEMINI_API_KEY=your-key-here ClawSandbox \
     bash /home/openclaw/tests/04-prompt-injection/run-via-api.sh
 ```
 
-The script runs 5 tests with 20-second cooldowns between each to avoid rate limiting. Total runtime is approximately 3 minutes.
+The script auto-detects the provider and runs 5 tests with 20-second cooldowns between each to avoid rate limiting. Total runtime is approximately 3 minutes.
 
 ### Step 5: Switch Back to Isolated Network
 
@@ -217,14 +227,14 @@ find tests/ -name "*.sh" -exec sed -i 's/\r$//' {} +
 git config --global core.autocrlf input
 ```
 
-### Gemini API Rate Limits
+### API Rate Limits
 
-The Gemini free tier has strict rate limits. If you see `RESOURCE_EXHAUSTED` errors:
+All providers have rate limits. If you see rate limit errors (`RESOURCE_EXHAUSTED` for Gemini, `429` for OpenAI/Anthropic):
 
-1. **Use `gemini-2.5-flash`** (the default) -- it has the highest free-tier quota.
-2. **Increase cooldown delays** -- the test script uses 20-second delays between tests. You can increase these by editing the `sleep` values in `run-via-api.sh`.
-3. **Create a new GCP project** -- each Google Cloud project gets its own quota. Create a fresh project at https://console.cloud.google.com and generate a new API key there.
-4. **Wait and retry** -- free-tier rate limits reset within minutes. Wait 2-3 minutes and run again.
+1. **Increase cooldown delays** -- the test scripts use 20-second delays between tests. You can increase these by editing the `sleep` values in the test scripts.
+2. **Wait and retry** -- rate limits typically reset within minutes. Wait 2-3 minutes and run again.
+3. **Gemini-specific:** Use `gemini-2.5-flash` (the default) for the highest free-tier quota, or create a new GCP project at https://console.cloud.google.com for a fresh quota.
+4. **Override the model** -- set `GEMINI_MODEL`, `OPENAI_MODEL`, or `ANTHROPIC_MODEL` to use a different model with higher limits.
 
 ### tmpfs Permission Errors
 
